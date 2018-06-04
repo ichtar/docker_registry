@@ -6,7 +6,14 @@ import (
         "net/http"
 	"io/ioutil"
 	"encoding/json"
+	"flag"
+	"strconv"
 )
+
+func init() {
+	// Tie the command-line flag to the intervalFlag variable and
+	// set a usage message.
+}
 
 func read_http_endpoint(query string) []byte {
     var headerName string = "Authorization"
@@ -32,7 +39,14 @@ func read_http_endpoint(query string) []byte {
 
 
 func main() {
-    url := "http://localhost:5000/v2/"
+    var address string 
+    var port int
+    flag.StringVar(&address, "u", "http://localhost", "registry url with schme (http/https)")
+    flag.IntVar(&port, "p" ,5000, "registry port")
+    flag.Parse()
+    url := strings.Join([]string{address,":",strconv.Itoa(port),"/v2/"},"")
+    fmt.Println(url)
+   //   url = "http://localhost:5000/v2/"
     catalog := "_catalog"
     tags := "/tags/list"
 
