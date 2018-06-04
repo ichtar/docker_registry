@@ -9,7 +9,16 @@ import (
 )
 
 func read_http_endpoint(query string) []byte {
-    resp, err := http.Get(query)
+    var headerName string = "Authorization"
+    var headerValue string = "silly"
+    client := &http.Client{}
+    req, err := http.NewRequest("GET", query, nil)
+    if err != nil {
+        panic(err)
+    }
+    req.Header.Set(headerName,headerValue)
+
+    resp, err := client.Do(req)
     if err != nil {
         panic(err)
     }
@@ -23,6 +32,10 @@ func read_http_endpoint(query string) []byte {
 
 
 func main() {
+    url := "http://localhost:5000/v2/"
+    catalog := "_catalog"
+    tags := "/tags/list"
+
     type Message struct {
         Repositories []string `json:"repositories"`
     }
@@ -30,21 +43,22 @@ func main() {
 	Name string   `json:"name"`
 	Tags []string `json:"tags"`
     }
-    http_json := read_http_endpoint("http://localhost:5000/v2/_catalog")
+    http_catalog := strings.Join([]string{url,catalog},"")
+    http_json := read_http_endpoint(http_catalog)
     var decoded Message
     err := json.Unmarshal(http_json, &decoded)
     if err != nil {
         panic(err)
     }
     for _,image := range decoded.Repositories {
-        http_tags := strings.Join([]string{"http://localhost:5000/v2/",image,"/tags/list"},"")
+        fmt.Println(image)
+        http_tags := strings.Join([]string{url,image,tags},"")
 	http_json2 := read_http_endpoint(http_tags)
         var decoded2 Message2
 	 err := json.Unmarshal(http_json2, &decoded2)
         if err != nil {
             panic(err)
         }
-//        fmt.Println(decoded2.Name)
 	for _,tag := range decoded2.Tags {
 	    fmt.Printf("%s:%s\n",decoded2.Name,tag)
 	}
