@@ -11,6 +11,10 @@ import (
 )
 
 func init() {
+    flag.StringVar(&address, "u", "http://localhost", "registry url with schme (http/https)")
+    flag.IntVar(&port, "p" ,5000, "registry port")
+    flag.StringVar(&user, "U" ,"dummy", "username for registry authentication")
+    flag.StringVar(&pass, "P" ,"dummy", "passwd for registry authentication")
 	// Tie the command-line flag to the intervalFlag variable and
 	// set a usage message.
 }
@@ -23,6 +27,7 @@ func read_http_endpoint(query string) []byte {
     if err != nil {
         panic(err)
     }
+    req.SetBasicAuth(user, pass)
     req.Header.Set(headerName,headerValue)
 
     resp, err := client.Do(req)
@@ -37,12 +42,11 @@ func read_http_endpoint(query string) []byte {
     return body
 }
 
-
-func main() {
     var address string 
     var port int
-    flag.StringVar(&address, "u", "http://localhost", "registry url with schme (http/https)")
-    flag.IntVar(&port, "p" ,5000, "registry port")
+    var user,pass  string
+
+func main() {
     flag.Parse()
     url := strings.Join([]string{address,":",strconv.Itoa(port),"/v2/"},"")
     fmt.Println(url)
